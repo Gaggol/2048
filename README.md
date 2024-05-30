@@ -22,24 +22,6 @@ This is a console-based implementation of the popular 2048 game written in C++. 
 - C++ compiler (e.g., g++ on Linux, MSVC on Windows)
 - A terminal that supports UTF-8 encoding
 
-### Compilation
-To compile the program on different platforms, follow the instructions below:
-
-#### Windows
-```sh
-g++ -o 2048_game 2048.cpp
-```
-#### Linux
-```sh
-g++ -o 2048_game 2048.cpp
-```
-## Running the Game
-After compilation, run the game using:
-
-```sh
-./2048_game
-```
-
 ## Usage
 Once the game starts, you will see the initial game board with two tiles. Use the following keys to move the tiles:
 
