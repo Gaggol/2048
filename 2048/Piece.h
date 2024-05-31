@@ -8,6 +8,8 @@ namespace GGL
 		int X;
 		int Y;
 		int Size;
+		DWORD bgColor = 0;
+		DWORD txtColor = 0;
 		Piece(int x, int y, int size) {
 			X = x;
 			Y = y;
@@ -15,6 +17,7 @@ namespace GGL
 		};
 		bool Move(wchar_t input);
 		bool ValidNeighbours();
+		void SetSize(int size);
 	};
 }
 

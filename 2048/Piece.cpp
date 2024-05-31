@@ -2,6 +2,20 @@
 #include "Piece.h"
 namespace GGL
 {
+	void Piece::SetSize(int size) {
+		Size = size;
+		txtColor = ColorTextHi;
+		switch(size) {
+			case 2:
+				txtColor = ColorTextLo;
+				break;
+			case 4:
+				txtColor = ColorTextLo;
+				break;
+		}
+		bgColor = Settings::GetColor((ColorTile)size);
+	}
+
 	bool Piece::ValidNeighbours() {
 		Piece* neighbour = nullptr;
 		if(Y - 1 >= 0) {
@@ -47,12 +61,13 @@ namespace GGL
 			return false;
 		}
 		if(neighbour->Size == Size) {
-			neighbour->Size *= 2;
+			neighbour->SetSize(Size * 2);
 		}
 		if(neighbour->Size == 0) {
-			neighbour->Size = Size;
+			neighbour->SetSize(Size);
 		}
-		Size = 0;
+		
+		SetSize(0);
 		return true;
 	}
 }
