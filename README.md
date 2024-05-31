@@ -1,6 +1,6 @@
 # 2048 Game
 
-This is a console-based implementation of the popular 2048 game written in C++. The game uses standard input for user interaction and displays the game board and score using wide character output. It is compatible with both Windows and Linux platforms.
+This is a application-based implementation of the popular 2048 game written in C++. The game uses standard input for user interaction and displays the game board and score using wide character output. It is compatible with Windows.
 
 ## Table of Contents
 - [Features](#features)
@@ -14,7 +14,6 @@ This is a console-based implementation of the popular 2048 game written in C++. 
 - Handles input for moving tiles (W, A, S, D)
 - Automatically adds a new tile after each valid move
 - Detects game over condition
-- Cross-platform support (Windows and Linux)
 
 ## Setup
 
