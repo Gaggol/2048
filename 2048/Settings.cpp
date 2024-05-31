@@ -3,15 +3,31 @@
 
 namespace GGL
 {
-	DWORD Settings::GetColor(ColorTile bgColor) {
-		try {
-			return ColorTileMap.at(bgColor);
-		} catch(const std::out_of_range& a) {
-			return ColorTileDefault;
+	HBRUSH Settings::GetBrush(ColorTile bgColor) {
+		return BrushMap.at(bgColor);
+	}
+
+	ColorTile Settings::GetTileColor(int size) {
+		if(size <= 2048) {
+			return (ColorTile)size;
+		}
+		return ColorTileBig;
+	}
+
+	std::unordered_map<ColorTile, HBRUSH> Settings::BrushMap = {};
+
+	void Settings::DestroyBrushes() {
+
+	}
+
+	void Settings::GenerateBrushes() {
+		for(const auto& pair : ColorTileMap) {
+			BrushMap.insert(std::make_pair(pair.first, CreateSolidBrush(pair.second)));
 		}
 	}
 
 	std::unordered_map<ColorTile, DWORD> Settings::ColorTileMap = {
+			{ ColorTileNone,	0x00000000 },
 			{ ColorTile2,		0x00DAE4EE },
 			{ ColorTile4,		0x00C8E0ED },
 			{ ColorTile8,		0x0079B1F2 },
@@ -23,6 +39,7 @@ namespace GGL
 			{ ColorTile512,		0x0050C8ED },
 			{ ColorTile1024,	0x003FC5ED },
 			{ ColorTile2048,	0x002EC2ED },
+			{ ColorTileBig,		0x00646464 },
 	};
 
 	Piece* Board[BoardSize][BoardSize];

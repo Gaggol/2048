@@ -1,7 +1,16 @@
 #include "Settings.h"
 #include "Piece.h"
+#include "GameLogic.h"
 namespace GGL
 {
+	Piece::Piece(int x, int y, int size) {
+		X = x;
+		Y = y;
+		Size = size;
+		Rect = { x * PixelsPerUnit, y * PixelsPerUnit, (x+1) * PixelsPerUnit, (y+1) * PixelsPerUnit };
+		SetSize(size);
+	};
+
 	void Piece::SetSize(int size) {
 		Size = size;
 		txtColor = ColorTextHi;
@@ -13,7 +22,7 @@ namespace GGL
 				txtColor = ColorTextLo;
 				break;
 		}
-		bgColor = Settings::GetColor((ColorTile)size);
+		bgColor = Settings::GetTileColor(size);
 	}
 
 	bool Piece::ValidNeighbours() {
@@ -37,37 +46,52 @@ namespace GGL
 		return false;
 	}
 
-	bool Piece::Move(wchar_t input) {
+	bool Piece::Move(Direction dir) {
 		Piece* neighbour = nullptr;
-		if(input == L'W') {
-			if(Y - 1 < 0) return false;
-			neighbour = Board[Y - 1][X];
-		}
-		if(input == L'A') {
-			if(X - 1 < 0) return false;
-			neighbour = Board[Y][X - 1];
-		}
-		if(input == L'S') {
-			if(Y + 1 >= BoardSize) return false;
-			neighbour = Board[Y + 1][X];
-		}
-		if(input == L'D') {
-			if(X + 1 >= BoardSize) return false;
-			neighbour = Board[Y][X + 1];
+		switch(dir) {
+			case GGL::DirectionLeft:
+				if(X - 1 < 0) return false;
+				neighbour = Board[Y][X - 1];
+				break;
+			case GGL::DirectionUp:
+				if(Y - 1 < 0) return false;
+				neighbour = Board[Y - 1][X];
+				break;
+			case GGL::DirectionRight:
+				if(X + 1 >= BoardSize) return false;
+				neighbour = Board[Y][X + 1];
+				break;
+			case GGL::DirectionDown:
+				if(Y + 1 >= BoardSize) return false;
+				neighbour = Board[Y + 1][X];
+				break;
+			default:
+				break;
 		}
 		if(neighbour == nullptr) return false;
 
-		if(neighbour->Size > 0 && neighbour->Size != Size) {
-			return false;
+		if(neighbour->Size > 0) {
+			if(neighbour->Size != Size) {
+				return false;
+			}
+			if(neighbour->hasIncreasedSize) {
+				return false;
+			}
+			if(neighbour->Size == Size) {
+				neighbour->SetSize(Size * 2);
+				neighbour->hasIncreasedSize = true;
+			}
 		}
-		if(neighbour->Size == Size) {
-			neighbour->SetSize(Size * 2);
-		}
-		if(neighbour->Size == 0) {
+		else if(neighbour->Size == 0) {
 			neighbour->SetSize(Size);
 		}
 		
+		if(hasIncreasedSize) hasIncreasedSize = false;
 		SetSize(0);
+
+		GameLogic::instance().InvalidatePiece(neighbour);
+		GameLogic::instance().InvalidatePiece(this);
+
 		return true;
 	}
 }

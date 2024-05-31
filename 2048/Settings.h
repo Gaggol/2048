@@ -3,16 +3,21 @@
 #include <Windows.h>
 #include <unordered_map>
 #include <stdexcept>
+#include <math.h>
 namespace GGL
 {
 	class Piece;
 
 	const int BoardSize = 4;
-	const int ValidSpawnNumbers[2] = { 2,4 };
+	const int ValidSpawnNumbers[2] = { 1024,1024 };
 	const int StartingPieces = 2;
 	extern Piece* Board[BoardSize][BoardSize];
 
-	const int PixelsPerUnit = 24;
+	const int FPS = 60;
+
+	const int Resolution = 800;
+	
+	const int PixelsPerUnit = Resolution / BoardSize;
 
 	//0x00BBGGRR
 	const DWORD Color_Red = 0x000000FF;
@@ -22,13 +27,23 @@ namespace GGL
 	const DWORD Color_Black = 0x00000000;
 
 	const DWORD ColorBG = 0x00F0F0F0;
+	const HBRUSH ColorBGBrush = CreateSolidBrush(ColorBG);
 
 	const DWORD ColorTextLo = 0x00656E77;
 	const DWORD ColorTextHi = 0x00F2F6F9;
 	
 	const DWORD ColorTileDefault = 0x00646464;
 
+	const enum Direction {
+		DirectionNone = -1,
+		DirectionLeft = 0,
+		DirectionUp = 1,
+		DirectionRight = 2,
+		DirectionDown = 3
+	};
+
 	const enum ColorTile {
+		ColorTileNone = 0,
 		ColorTile2 = 2,
 		ColorTile4 = 4,
 		ColorTile8 = 8,
@@ -39,13 +54,18 @@ namespace GGL
 		ColorTile256 = 256,
 		ColorTile512 = 512,
 		ColorTile1024 = 1024,
-		ColorTile2048 = 2048
+		ColorTile2048 = 2048,
+		ColorTileBig = 9999
 	};
 
 	class Settings {
 	public:
-		static DWORD GetColor(ColorTile bgColor);
+		static ColorTile GetTileColor(int size);
+		static HBRUSH GetBrush(ColorTile bgColor);
+		static void DestroyBrushes();
+		static void GenerateBrushes();
 	private:
+		static std::unordered_map<ColorTile, HBRUSH> BrushMap;
 		static std::unordered_map<ColorTile, DWORD> ColorTileMap;
 		/*
 		std::unordered_map<ColorTile, DWORD> ColorTileMap = {

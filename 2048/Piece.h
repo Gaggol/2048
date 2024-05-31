@@ -8,14 +8,13 @@ namespace GGL
 		int X;
 		int Y;
 		int Size;
-		DWORD bgColor = 0;
+		bool hasIncreasedSize = false;
+		bool newSpawn = false;
+		ColorTile bgColor = ColorTileNone;
 		DWORD txtColor = 0;
-		Piece(int x, int y, int size) {
-			X = x;
-			Y = y;
-			Size = size;
-		};
-		bool Move(wchar_t input);
+		Piece(int x, int y, int size);
+		RECT Rect;
+		bool Move(Direction dir);
 		bool ValidNeighbours();
 		void SetSize(int size);
 	};
