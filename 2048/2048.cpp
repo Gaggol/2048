@@ -17,13 +17,8 @@ int main() {
 }
 #endif
 
-int wmain(int argc, wchar_t* argv[]) {
+int wWinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PWSTR l, int i) {
 	srand((unsigned int)GetTickCount64());
 	GameLogic::instance().SetupGame();
-	GameLogic::instance().SetupGame();
 	GameLogic::instance().Cleanup();
-
-	std::wcout << "Enter to Exit";
-	std::wcin.ignore();
-	std::wcin.get();
 }

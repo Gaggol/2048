@@ -44,9 +44,9 @@ namespace GGL
 		if(input.GetKeyDown(VK_S)) return DirectionDown;
 		return DirectionNone;
 	}
-
+	
 	void GameLogic::Debug() {
-		system("CLS");
+		//system("CLS");
 		for(int y = 0; y < BoardSize; y++) {
 			for(int x = 0; x < BoardSize; x++) {
 				std::wcout << Board[y][x]->Size << " ";
@@ -134,7 +134,6 @@ namespace GGL
 
 		if(dir != DirectionNone) {
 			input.FlushKeys();
-			std::cout << "Flush Keys";
 			TryToMove(dir);
 #ifdef _DEBUG
 			//Debug();
@@ -191,14 +190,14 @@ namespace GGL
 		return ignoreKeys;
 	}
 
-	int GameLogic::MSGLoop(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	LRESULT GameLogic::MSGLoop(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		switch(uMsg) {
 
 			case WM_KEYDOWN:
 				if(ignoreKeys) return 0;
 				ignoreKeys = true;
 				input.SetKeyDown((int)wParam);
-				
+
 				GameLogic::instance().Update();
 				GameLogic::instance().ResetTickTimer();
 				InvalidateRect(hwnd, NULL, true);
@@ -212,6 +211,7 @@ namespace GGL
 
 			case WM_DESTROY:
 				Settings::DestroyBrushes();
+				PostQuitMessage(0);
 				return 0;
 
 			case WM_PAINT:
@@ -237,10 +237,11 @@ namespace GGL
 						}
 					}
 				}
-
 				EndPaint(hwnd, &ps);
 				return 0;
 		}
+		return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+
 	}
 
 	uint64_t tickTimeStamp = 0;

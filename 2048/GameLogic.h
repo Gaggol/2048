@@ -9,7 +9,7 @@ namespace GGL
 	public:
 		void SetupGame();
 		void Cleanup();
-		int MSGLoop(HWND, UINT, WPARAM, LPARAM);
+		LRESULT MSGLoop(HWND, UINT, WPARAM, LPARAM);
 		void Update();
 		static GameLogic instance() { static GameLogic GL; return GL; }
 		void TryTick();
