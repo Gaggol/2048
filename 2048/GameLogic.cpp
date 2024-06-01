@@ -11,8 +11,11 @@ namespace GGL
 	Piece* orgBoard[BoardSize][BoardSize] = {};
 	Input input;
 
+	GameLogic GameLogic::glInstance;
+
 	void GameLogic::SetupGame() {
 		score = 0;
+		gameOver = false;
 		hasMoved = false;
 		isTryingToMove = false;
 		for(int y = 0; y < BoardSize; y++) {
@@ -24,6 +27,7 @@ namespace GGL
 	}
 
 	void GameLogic::StartGame() {
+		
 		int _startingPieces = StartingPieces;
 
 		while(_startingPieces > 0) {
@@ -34,7 +38,12 @@ namespace GGL
 #ifdef _DEBUG
 		Debug();
 #endif
-		Window::CreateGUI();
+		if(!uiCreated) {
+			uiCreated = true;
+			Window::CreateGUI();
+		}
+		InvalidateRect(hwnd, NULL, true);
+		UpdateWindow(hwnd);
 	}
 
 	Direction GameLogic::_direction() {
@@ -46,15 +55,8 @@ namespace GGL
 	}
 	
 	void GameLogic::Debug() {
+		return;
 		//system("CLS");
-		for(int y = 0; y < BoardSize; y++) {
-			for(int x = 0; x < BoardSize; x++) {
-				std::wcout << Board[y][x]->Size << " ";
-				score += Board[y][x]->Size;
-			}
-			std::wcout << std::endl;
-		}
-		std::wcout << "Score: " << score << std::endl;
 	}
 
 	void GameLogic::TryToMove(Direction dir) {
@@ -122,13 +124,21 @@ namespace GGL
 	}
 
 	void GameLogic::InvalidatePiece(Piece* piece) {
-		InvalidateRect(hwnd, NULL, false);
+		InvalidateRect(hwnd, &piece->Rect, false);
 	}
 
 	void GameLogic::Update() {
+		if(gameOver) {
+			ignoreKeys = false;
+			if(input.GetKeyDown(VK_R)) {
+				input.FlushKeys();
+				SetupGame();
+				return;
+			}
+			return;
+		}
 		hasMoved = false;
 		isTryingToMove = false;
-
 
 		Direction dir = _direction();
 
@@ -141,10 +151,22 @@ namespace GGL
 		}
 
 		if(hasMoved) {
+			oldScore = score;
+			score = 0;
+			for(int y = 0; y < BoardSize; y++) {
+				for(int x = 0; x < BoardSize; x++) {
+					score += Board[y][x]->Size;
+				}
+			}
 			InvalidateRect(hwnd, NULL, true);
 			UpdateWindow(hwnd);
 		}
-		IsBoardFilled();
+		gameOver = IsBoardFilled();
+		if(gameOver) {
+			InvalidateRect(hwnd, NULL, true);
+			UpdateWindow(hwnd);
+			std::wcout << "Game Over" << std::endl;
+		}
 		ignoreKeys = false;
 	}
 
@@ -190,23 +212,35 @@ namespace GGL
 		return ignoreKeys;
 	}
 
-	LRESULT GameLogic::MSGLoop(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	wchar_t buffer[64];
+	LRESULT GameLogic::MSGLoop(HWND _hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		switch(uMsg) {
 
+			case WM_ERASEBKGND:
+				return 1;
+
 			case WM_KEYDOWN:
+#if _DEBUG
+				if((char)wParam == 'C') {
+					//TODO: CHANGING RESOLUTION
+					Resolution[0] += 5;
+					SetWindowPos(hwnd, NULL, 50, 50, Resolution[0], Resolution[1], SWP_NOMOVE);
+				}
+#endif
 				if(ignoreKeys) return 0;
 				ignoreKeys = true;
+				std::wcout << (char)wParam << std::endl;
 				input.SetKeyDown((int)wParam);
 
-				GameLogic::instance().Update();
-				GameLogic::instance().ResetTickTimer();
-				InvalidateRect(hwnd, NULL, true);
+				Update();
+				ResetTickTimer();
+				//InvalidateRect(hwnd, NULL, false);
 				UpdateWindow(hwnd);
 				return 0;
 
 			case WM_CREATE:
 				Settings::GenerateBrushes();
-				this->hwnd = hwnd;
+				hwnd = _hwnd;
 				return 0;
 
 			case WM_DESTROY:
@@ -217,16 +251,17 @@ namespace GGL
 			case WM_PAINT:
 				PAINTSTRUCT ps;
 				HDC hdc = BeginPaint(hwnd, &ps);
+				SetBkMode(hdc, TRANSPARENT);
 				FillRect(hdc, &ps.rcPaint, ColorBGBrush);
 				for(int y = 0; y < BoardSize; y++) {
 					for(int x = 0; x < BoardSize; x++) {
 						Piece* p = Board[y][x];
+						if(p->Size == 0) continue;
+						Window::NormalTextFont(hdc);
+						SetTextColor(hdc, Color_Black);
 						FillRect(hdc, &p->Rect, Settings::GetBrush(p->bgColor));
 						if(p->Size > 0) {
-							Window::NormalTextFont(hdc);
 							SetTextColor(hdc, p->txtColor);
-							SetBkMode(hdc, TRANSPARENT);
-							wchar_t buffer[16];
 							wsprintfW(buffer, L"%d", p->Size);
 							DrawTextW(hdc, buffer, -1, &p->Rect, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
 							if(p->newSpawn) {
@@ -237,10 +272,21 @@ namespace GGL
 						}
 					}
 				}
+				if(oldScore < score || score == 0) {
+					Window::NormalTextFont(hdc);
+					SetTextColor(hdc, Color_Black);
+					wsprintfW(buffer, L"Score: %d", score);
+					DrawTextW(hdc, buffer, -1, Window::GetInfoBarRect(), DT_LEFT | DT_SINGLELINE | DT_VCENTER);
+				}
+				if(gameOver) {
+					Window::NormalTextFont(hdc);
+					SetTextColor(hdc, Color_Red);
+					DrawTextW(hdc, L"Game Over", -1, Window::GetInfoBarRect(), DT_CENTER | DT_SINGLELINE | DT_VCENTER);
+				}
 				EndPaint(hwnd, &ps);
 				return 0;
 		}
-		return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+		return DefWindowProcW(_hwnd, uMsg, wParam, lParam);
 
 	}
 

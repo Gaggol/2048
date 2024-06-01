@@ -2,36 +2,61 @@
 #include "Window.h"
 #include "GameLogic.h"
 #include <chrono>
+#include <iostream>
 
 namespace GGL
 {
 
-	HFONT hFont;
-	void Window::NormalTextFont(HDC hdc) {
-		LOGFONTW lf = { 0 };
+	RECT InfoBarRect = { spacingOffset, 0, (Resolution[0] - spacingOffset), infoBarOffset};
+	RECT* Window::GetInfoBarRect() {
+		return &InfoBarRect;
+	}
 
-		lf.lfHeight = 40;
-		lf.lfWeight = FW_BOLD;
+	LOGFONTW lf { 0 };
+	HFONT smallFont = nullptr;
+	HFONT normalFont = nullptr;
+
+	void Window::ChangeResolution(int x, int y) {
 		
-		wcscpy_s(lf.lfFaceName, L"Arial");
+	}
 
-		hFont = CreateFontIndirectW(&lf);
+	void Window::NormalTextFont(HDC hdc) {
+		if(normalFont == nullptr) {
+			lf = { 0 };
+			normalFont = { 0 };
 
-		SelectObject(hdc, hFont);
+			lf.lfHeight = 40;
+			lf.lfWeight = FW_BOLD;
+
+			wcscpy_s(lf.lfFaceName, L"Arial");
+
+			normalFont = CreateFontIndirectW(&lf);
+		}
+		SelectObject(hdc, normalFont);
 	}
 
 	void Window::SmallTextFont(HDC hdc) {
-		LOGFONTW lf = { 0 };
-		lf.lfHeight = 20;
-		lf.lfWeight = FW_BOLD;
-		wcscpy_s(lf.lfFaceName, L"Arial");
-		hFont = CreateFontIndirectW(&lf);
-		SelectObject(hdc, hFont);
+		if(smallFont == nullptr) {
+			lf = { 0 };
+			smallFont = { 0 };
+
+			lf.lfHeight = 20;
+			lf.lfWeight = FW_BOLD;
+
+			wcscpy_s(lf.lfFaceName, L"Arial");
+			smallFont = CreateFontIndirectW(&lf);
+		}
+		SelectObject(hdc, smallFont);
+	}
+
+	void Window::CleanFonts() {
+		//delete smallFont;
+		//delete normalFont;
 	}
 
 
 	LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-		if(GameLogic::instance().MSGLoop(hwnd, uMsg, wParam, lParam) == 0)
+		if(GGL::GameLogic::GL()->MSGLoop(hwnd, uMsg, wParam, lParam) == 0)
 			return 0;
 		return DefWindowProcW(hwnd, uMsg, wParam, lParam);
 	}
@@ -49,11 +74,19 @@ namespace GGL
 
 		DWORD style = WS_CAPTION | WS_SYSMENU;
 
-		RECT clientArea = { 0, 0, Resolution, Resolution };
+		// LEFT TOP RIGHT BOTTOM
+
+		RECT clientArea = { 0, 0,
+			Resolution[0] + spacingOffset,
+			Resolution[1] + spacingOffset + infoBarOffset
+		};
 		AdjustWindowRect(&clientArea, style, false);
+		
+		int screenWidth = (GetSystemMetrics(SM_CXSCREEN) - clientArea.right)/2;
+		int screenHeight = (GetSystemMetrics(SM_CYSCREEN) - clientArea.bottom)/2;
 
 		HWND gui;
-		gui = CreateWindowExW(0, L"GGL - 2048", L"2048", style, CW_USEDEFAULT, CW_USEDEFAULT, clientArea.right - clientArea.left, clientArea.bottom - clientArea.top, NULL, NULL, hInstance, NULL);
+		gui = CreateWindowExW(0, L"GGL - 2048", L"2048", style, screenWidth, screenHeight, clientArea.right - clientArea.left, clientArea.bottom - clientArea.top, NULL, NULL, hInstance, NULL);
 
 		if(gui == NULL) {
 			return;
@@ -64,12 +97,12 @@ namespace GGL
 		MSG msg = {};
 
 		while(WM_QUIT != msg.message) {
-			if(PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {	
+			if(PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
 				TranslateMessage(&msg);
 				DispatchMessageW(&msg);
 				continue;
 			}
-			GameLogic::instance().TryTick();
-		}		
+			GGL::GameLogic::GL()->TryTick();
+		}
 	}
 }

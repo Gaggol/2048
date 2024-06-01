@@ -3,6 +3,13 @@
 
 namespace GGL
 {
+	void Settings::MoveRECT(RECT* rect, int offsetWidth, int offsetHeight) {
+		rect->left += offsetWidth;
+		rect->right += offsetWidth;
+		rect->top += offsetHeight;
+		rect->bottom += offsetHeight;
+	}
+
 	HBRUSH Settings::GetBrush(ColorTile bgColor) {
 		return BrushMap.at(bgColor);
 	}

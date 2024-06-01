@@ -7,7 +7,11 @@ namespace GGL
 		X = x;
 		Y = y;
 		Size = size;
-		Rect = { x * PixelsPerUnit, y * PixelsPerUnit, (x+1) * PixelsPerUnit, (y+1) * PixelsPerUnit };
+		Rect = { 
+			x * PixelsPerUnit[0] + spacingOffset,
+			y * PixelsPerUnit[1] + spacingOffset + infoBarOffset,
+			(x+1) * PixelsPerUnit[0] - spacingOffset / 2,
+			(y+1) * PixelsPerUnit[1] - spacingOffset / 2 + infoBarOffset};
 		SetSize(size);
 	};
 
@@ -23,6 +27,7 @@ namespace GGL
 				break;
 		}
 		bgColor = Settings::GetTileColor(size);
+		//GameLogic::instance().InvalidatePiece(this);
 	}
 
 	bool Piece::ValidNeighbours() {
@@ -89,8 +94,8 @@ namespace GGL
 		if(hasIncreasedSize) hasIncreasedSize = false;
 		SetSize(0);
 
-		GameLogic::instance().InvalidatePiece(neighbour);
-		GameLogic::instance().InvalidatePiece(this);
+		GGL::GameLogic::GL()->InvalidatePiece(neighbour);
+		GGL::GameLogic::GL()->InvalidatePiece(this);
 
 		return true;
 	}

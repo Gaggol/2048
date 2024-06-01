@@ -10,6 +10,9 @@ namespace GGL
 		static void CreateGUI();
 		static void NormalTextFont(HDC);
 		static void SmallTextFont(HDC);
+		static RECT* GetInfoBarRect();
+		static void CleanFonts();
+		static void ChangeResolution(int, int);
 	};
 }
 

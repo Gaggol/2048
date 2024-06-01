@@ -15,9 +15,11 @@ namespace GGL
 
 	const int FPS = 60;
 
-	const int Resolution = 800;
+	static int Resolution[2] = { 800, 800 };
 	
-	const int PixelsPerUnit = Resolution / BoardSize;
+	static int PixelsPerUnit[2] = { Resolution[0] / BoardSize, Resolution[1] / BoardSize };
+	static int spacingOffset = 6;
+	static int infoBarOffset = 40;
 
 	//0x00BBGGRR
 	const DWORD Color_Red = 0x000000FF;
@@ -25,6 +27,16 @@ namespace GGL
 	const DWORD Color_Blue = 0x00FF0000;
 	const DWORD Color_White = 0x00FFFFFF;
 	const DWORD Color_Black = 0x00000000;
+
+	const DWORD Color_MenuBG = 0x00AAAAAA;
+	const DWORD Color_MenuButton = 0x00CCCCCC;
+	const DWORD Color_MenuButtonBTN = 0x00DDDDDD;
+	const DWORD Color_MenuButtonBTN_HI = 0x00EEEEEE;
+
+	const HBRUSH BrushColorMenuBG = CreateSolidBrush(Color_MenuBG);
+	const HBRUSH BrushColorMenuButton = CreateSolidBrush(Color_MenuButton);
+	const HBRUSH BrushColorMenuButtonBTN = CreateSolidBrush(Color_MenuButtonBTN);
+	const HBRUSH BrushColorMenuButtonBTNHI = CreateSolidBrush(Color_MenuButtonBTN_HI);
 
 	const DWORD ColorBG = 0x00F0F0F0;
 	const HBRUSH ColorBGBrush = CreateSolidBrush(ColorBG);
@@ -64,6 +76,7 @@ namespace GGL
 		static HBRUSH GetBrush(ColorTile bgColor);
 		static void DestroyBrushes();
 		static void GenerateBrushes();
+		static void MoveRECT(RECT*, int, int);
 	private:
 		static std::unordered_map<ColorTile, HBRUSH> BrushMap;
 		static std::unordered_map<ColorTile, DWORD> ColorTileMap;

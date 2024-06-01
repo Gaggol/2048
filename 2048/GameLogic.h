@@ -7,17 +7,19 @@ namespace GGL
 {
 	class GameLogic {
 	public:
+		static GameLogic* GL() { return &glInstance; }
 		void SetupGame();
 		void Cleanup();
 		LRESULT MSGLoop(HWND, UINT, WPARAM, LPARAM);
 		void Update();
-		static GameLogic instance() { static GameLogic GL; return GL; }
 		void TryTick();
 		void InvalidatePiece(Piece*);
 		bool IsIgnoringKeys();
 	private:
+		static GameLogic glInstance;
 		Piece* orgBoard[BoardSize][BoardSize];
 		int score;
+		int oldScore;
 		bool hasMoved;
 		bool isTryingToMove;
 		void StartGame();
@@ -30,6 +32,8 @@ namespace GGL
 		void ResetTickTimer();
 		HWND hwnd;
 		bool ignoreKeys;
+		bool gameOver;
+		bool uiCreated;
 	};
 }
 
