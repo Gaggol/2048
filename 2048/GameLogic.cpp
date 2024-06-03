@@ -216,9 +216,6 @@ namespace GGL
 	LRESULT GameLogic::MSGLoop(HWND _hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		switch(uMsg) {
 
-			case WM_ERASEBKGND:
-				return 1;
-
 			case WM_KEYDOWN:
 #if _DEBUG
 				if((char)wParam == 'C') {
@@ -259,9 +256,13 @@ namespace GGL
 						if(p->Size == 0) continue;
 						Window::NormalTextFont(hdc);
 						SetTextColor(hdc, Color_Black);
-						FillRect(hdc, &p->Rect, Settings::GetBrush(p->bgColor));
+						FillRect(hdc, &p->Rect, Settings::GetBrush(p->Size));
 						if(p->Size > 0) {
-							SetTextColor(hdc, p->txtColor);
+							if(p->Size == 2 || 4) {
+								SetTextColor(hdc, ColorTextLo);
+							} else {
+								SetTextColor(hdc, ColorTextHi);
+							}
 							wsprintfW(buffer, L"%d", p->Size);
 							DrawTextW(hdc, buffer, -1, &p->Rect, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
 							if(p->newSpawn) {

@@ -17,17 +17,7 @@ namespace GGL
 
 	void Piece::SetSize(int size) {
 		Size = size;
-		txtColor = ColorTextHi;
-		switch(size) {
-			case 2:
-				txtColor = ColorTextLo;
-				break;
-			case 4:
-				txtColor = ColorTextLo;
-				break;
-		}
-		bgColor = Settings::GetTileColor(size);
-		//GameLogic::instance().InvalidatePiece(this);
+		GameLogic::GL()->InvalidatePiece(this);
 	}
 
 	bool Piece::ValidNeighbours() {
@@ -93,9 +83,6 @@ namespace GGL
 		
 		if(hasIncreasedSize) hasIncreasedSize = false;
 		SetSize(0);
-
-		GGL::GameLogic::GL()->InvalidatePiece(neighbour);
-		GGL::GameLogic::GL()->InvalidatePiece(this);
 
 		return true;
 	}

@@ -10,8 +10,6 @@ namespace GGL
 		int Size;
 		bool hasIncreasedSize = false;
 		bool newSpawn = false;
-		ColorTile bgColor = ColorTileNone;
-		DWORD txtColor = 0;
 		Piece(int x, int y, int size);
 		RECT Rect;
 		bool Move(Direction dir);

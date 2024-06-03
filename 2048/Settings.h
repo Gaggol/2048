@@ -54,47 +54,15 @@ namespace GGL
 		DirectionDown = 3
 	};
 
-	const enum ColorTile {
-		ColorTileNone = 0,
-		ColorTile2 = 2,
-		ColorTile4 = 4,
-		ColorTile8 = 8,
-		ColorTile16 = 16,
-		ColorTile32 = 32,
-		ColorTile64 = 64,
-		ColorTile128 = 128,
-		ColorTile256 = 256,
-		ColorTile512 = 512,
-		ColorTile1024 = 1024,
-		ColorTile2048 = 2048,
-		ColorTileBig = 9999
-	};
-
 	class Settings {
 	public:
-		static ColorTile GetTileColor(int size);
-		static HBRUSH GetBrush(ColorTile bgColor);
+		static HBRUSH GetBrush(int);
 		static void DestroyBrushes();
 		static void GenerateBrushes();
 		static void MoveRECT(RECT*, int, int);
 	private:
-		static std::unordered_map<ColorTile, HBRUSH> BrushMap;
-		static std::unordered_map<ColorTile, DWORD> ColorTileMap;
-		/*
-		std::unordered_map<ColorTile, DWORD> ColorTileMap = {
-			{ ColorTile2,		0x00DAE4EE },
-			{ ColorTile4,		0x00C8E0ED },
-			{ ColorTile8,		0x0079B1F2 },
-			{ ColorTile16,		0x006395F5 },
-			{ ColorTile32,		0x005F7CF6 },
-			{ ColorTile64,		0x003B5EF6 },
-			{ ColorTile128,		0x0072CFED },
-			{ ColorTile256,		0x0061CCED },
-			{ ColorTile512,		0x0050C8ED },
-			{ ColorTile1024,	0x003FC5ED },
-			{ ColorTile2048,	0x002EC2ED },
-		};
-		*/
+		static std::unordered_map<int, HBRUSH> BrushMap;
+		static std::unordered_map<int, DWORD> ColorTileMap;
 	};
 }
 #endif

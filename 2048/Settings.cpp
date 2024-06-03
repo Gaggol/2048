@@ -10,18 +10,11 @@ namespace GGL
 		rect->bottom += offsetHeight;
 	}
 
-	HBRUSH Settings::GetBrush(ColorTile bgColor) {
-		return BrushMap.at(bgColor);
+	HBRUSH Settings::GetBrush(int size) {
+		return BrushMap.at(size);
 	}
 
-	ColorTile Settings::GetTileColor(int size) {
-		if(size <= 2048) {
-			return (ColorTile)size;
-		}
-		return ColorTileBig;
-	}
-
-	std::unordered_map<ColorTile, HBRUSH> Settings::BrushMap = {};
+	std::unordered_map<int, HBRUSH> Settings::BrushMap = {};
 
 	void Settings::DestroyBrushes() {
 
@@ -33,20 +26,20 @@ namespace GGL
 		}
 	}
 
-	std::unordered_map<ColorTile, DWORD> Settings::ColorTileMap = {
-			{ ColorTileNone,	0x00000000 },
-			{ ColorTile2,		0x00DAE4EE },
-			{ ColorTile4,		0x00C8E0ED },
-			{ ColorTile8,		0x0079B1F2 },
-			{ ColorTile16,		0x006395F5 },
-			{ ColorTile32,		0x005F7CF6 },
-			{ ColorTile64,		0x003B5EF6 },
-			{ ColorTile128,		0x0072CFED },
-			{ ColorTile256,		0x0061CCED },
-			{ ColorTile512,		0x0050C8ED },
-			{ ColorTile1024,	0x003FC5ED },
-			{ ColorTile2048,	0x002EC2ED },
-			{ ColorTileBig,		0x00646464 },
+	std::unordered_map<int, DWORD> Settings::ColorTileMap = {
+			{ 0,		0x00000000 },
+			{ 1,		0x00646464 },
+			{ 2,		0x00DAE4EE },
+			{ 4,		0x00C8E0ED },
+			{ 8,		0x0079B1F2 },
+			{ 16,		0x006395F5 },
+			{ 32,		0x005F7CF6 },
+			{ 64,		0x003B5EF6 },
+			{ 128,		0x0072CFED },
+			{ 256,		0x0061CCED },
+			{ 512,		0x0050C8ED },
+			{ 1024,		0x003FC5ED },
+			{ 2048,		0x002EC2ED },
 	};
 
 	Piece* Board[BoardSize][BoardSize];
